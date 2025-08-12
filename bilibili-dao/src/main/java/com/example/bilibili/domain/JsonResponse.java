@@ -1,4 +1,4 @@
-package com.example.bilibili.dao.domain;
+package com.example.bilibili.domain;
 
 public class JsonResponse<T> {
     private String code; //returned status code e.g: 200/300/404

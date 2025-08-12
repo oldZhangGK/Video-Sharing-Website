@@ -1,7 +1,7 @@
 package com.example.bilibili.service.handler;
 
-import com.example.bilibili.dao.domain.JsonResponse;
-import com.example.bilibili.dao.domain.exception.ConditionException;
+import com.example.bilibili.domain.JsonResponse;
+import com.example.bilibili.domain.exception.ConditionException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ControllerAdvice;

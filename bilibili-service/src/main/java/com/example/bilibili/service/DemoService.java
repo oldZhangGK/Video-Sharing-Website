@@ -1,5 +1,5 @@
 package com.example.bilibili.service;
-import com.example.bilibili.dao.DemoDao;
+import com.example.bilibili.DemoDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
