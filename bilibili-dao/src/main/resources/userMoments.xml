@@ -1,0 +1,16 @@
+<mapper namespace="com.example.bilibili.dao.UserMomentsDao">
+    <insert id="addUserMoments" parameterType="com.example.bilibili.domain.UserMoment" useGeneratedKeys="true" keyProperty="id">
+        insert into
+        t_user_moments(
+        userId,
+        `type`,
+        contentId,
+        createTime
+        )values(
+        #{userId},
+        #{type},
+        #{contentId},
+        #{createTime}
+        )
+    </insert>
+</mapper>

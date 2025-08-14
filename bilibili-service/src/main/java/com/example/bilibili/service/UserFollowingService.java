@@ -145,4 +145,5 @@ public class UserFollowingService {
     public void updateUserFollowings(UserFollowing userFollowing) {
         userFollowingDao.updateUserFollowings(userFollowing);
     }
+
 }

@@ -1,8 +1,12 @@
 package com.example.bilibili.dao;
+import com.alibaba.fastjson.JSONObject;
 import com.example.bilibili.domain.User;
 import com.example.bilibili.domain.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 
 @Mapper
@@ -23,4 +27,8 @@ public interface UserDao {
     Integer updateUsers(User user);
 
     Integer updateUserInfos(UserInfo userInfo);
+
+    Integer pageCountUserInfos(Map<String, Object> params);
+
+    List<UserInfo> pageListUserInfos(JSONObject params);
 }

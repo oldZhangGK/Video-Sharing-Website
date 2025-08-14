@@ -1,6 +1,8 @@
 package com.example.bilibili.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.bilibili.dao.UserDao;
+import com.example.bilibili.domain.PageResult;
 import com.example.bilibili.domain.User;
 import com.example.bilibili.domain.UserInfo;
 import com.example.bilibili.domain.constant.UserConstant;
@@ -13,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -140,5 +144,18 @@ public class UserService {
 
     public User getUserById(Long followingId) {
         return userDao.getUserById(followingId);
+    }
+
+    public PageResult<UserInfo> pageListUserInfos(JSONObject params) {
+        Integer no = params.getInteger("no");
+        Integer size = params.getInteger("size");
+        params.put("start", (no-1)*size); //从哪个INDEX开始，就是第几页开始
+        params.put("limit", size);
+        Integer total = userDao.pageCountUserInfos(params);
+        List<UserInfo> list = new ArrayList<>();
+        if (total > 0) {
+            list = userDao.pageListUserInfos(params);
+        }
+        return new PageResult<>(total, list);
     }
 }
