@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -144,6 +145,10 @@ public class UserService {
 
     public User getUserById(Long followingId) {
         return userDao.getUserById(followingId);
+    }
+
+    public List<UserInfo> getUserInfoByUserIds(Set<Long> userIdList) {
+        return userDao.getUserInfoByUserIds(userIdList);
     }
 
     public PageResult<UserInfo> pageListUserInfos(JSONObject params) {

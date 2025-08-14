@@ -38,6 +38,7 @@ public class UserMomentsService {
     }
 
     public List<UserMoment> getUserSubscribedMoments(Long userId) {
+        //因为我们把数据都存进缓存REDIS里了，所以就不需要DAO
         String key = "subscribed-" + userId;
         String listStr = redisTemplate.opsForValue().get(key);
         return JSONArray.parseArray(listStr, UserMoment.class);

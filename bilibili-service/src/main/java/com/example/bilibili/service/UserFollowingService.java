@@ -58,7 +58,7 @@ public class UserFollowingService {
         Set<Long> followingIdSet = list.stream().map(UserFollowing::getFollowingId).collect(Collectors.toSet());
         List<UserInfo> userInfoList = new ArrayList<>();
         if(followingIdSet.size() > 0){
-            //userInfoList = userService.getUserInfoByUserIds(followingIdSet);
+            userInfoList = userService.getUserInfoByUserIds(followingIdSet);
         }
         for(UserFollowing userFollowing : list){
             for(UserInfo userInfo : userInfoList){
@@ -95,7 +95,7 @@ public class UserFollowingService {
         Set<Long> fanIdSet = fanList.stream().map(UserFollowing::getUserId).collect(Collectors.toSet());
         List<UserInfo> userInfoList = new ArrayList<>();
         if(fanIdSet.size() > 0){
-            //userInfoList = userService.getUserInfoByUserIds(fanIdSet);
+            userInfoList = userService.getUserInfoByUserIds(fanIdSet);
         }
         List<UserFollowing> followingList = userFollowingDao.getUserFollowings(userId);
         for(UserFollowing fan : fanList){

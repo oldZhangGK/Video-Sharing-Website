@@ -7,6 +7,8 @@ import com.example.bilibili.service.UserMomentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 public class UserMomentsApi {
@@ -24,5 +26,12 @@ public class UserMomentsApi {
         userMoment.setUserId(userId);
         userMomentsService.addUserMoments(userMoment);
         return JsonResponse.success();
+    }
+
+    @GetMapping("/user-subscribed-moments")
+    public JsonResponse<List<UserMoment>> getUserSubscribedMoments(){
+        Long userId = userSupport.getCurrentUserId();
+        List<UserMoment> list = userMomentsService.getUserSubscribedMoments(userId);
+        return new JsonResponse<>(list);
     }
 }
