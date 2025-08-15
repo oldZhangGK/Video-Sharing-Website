@@ -25,6 +25,9 @@ public class UserService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private UserAuthService userAuthService;
+
     //Transactional make this operation atomic which will either all success or all fail if one operation failed
     @Transactional
     public void addUser(User user){
@@ -71,6 +74,9 @@ public class UserService {
         userInfo.setGender(UserConstant.GENDER_MALE);
         userInfo.setCreateTime(now);
         userDao.addUserInfo(userInfo);
+
+        //add user default role
+        userAuthService.addUserDefaultRole(user.getId());
     }
 
     public User  getUserByPhone(String phone){
