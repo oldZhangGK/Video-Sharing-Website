@@ -242,23 +242,23 @@ public class FastDFSUtil {
 //        HttpUtil.get(url, headers, response);
 //    }
 //
-//    // Download file
-//    public void downLoadFile(String url, String localPath) {
-//        fastFileStorageClient.downloadFile(DEFAULT_GROUP, url,
-//                new DownloadCallback<String>() {
-//                    @Override
-//                    public String recv(InputStream ins) throws IOException {
-//                        File file = new File(localPath);
-//                        OutputStream os = new FileOutputStream(file);
-//                        int len = 0;
-//                        byte[] buffer = new byte[1024];
-//                        while ((len = ins.read(buffer)) != -1) {
-//                            os.write(buffer, 0, len);
-//                        }
-//                        os.close();
-//                        ins.close();
-//                        return "success";
-//                    }
-//                });
-//    }
+    // Download file
+    public void downLoadFile(String url, String localPath) {
+        fastFileStorageClient.downloadFile(DEFAULT_GROUP, url,
+                new DownloadCallback<String>() {
+                    @Override
+                    public String recv(InputStream ins) throws IOException {
+                        File file = new File(localPath);
+                        OutputStream os = new FileOutputStream(file);
+                        int len = 0;
+                        byte[] buffer = new byte[1024];
+                        while ((len = ins.read(buffer)) != -1) {
+                            os.write(buffer, 0, len);
+                        }
+                        os.close();
+                        ins.close();
+                        return "success";
+                    }
+                });
+    }
 }
