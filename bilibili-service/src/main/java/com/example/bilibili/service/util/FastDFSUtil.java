@@ -206,42 +206,42 @@ public class FastDFSUtil {
 
 
 
-//    public void viewVideoOnlineBySlices(HttpServletRequest request,
-//                                        HttpServletResponse response,
-//                                        String path) throws Exception{
-//        FileInfo fileInfo = fastFileStorageClient.queryFileInfo(DEFAULT_GROUP, path);
-//        long totalFileSize = fileInfo.getFileSize();
-//        String url = httpFdfsStorageAddr + path;
-//        Enumeration<String> headerNames = request.getHeaderNames();
-//        Map<String, Object> headers = new HashMap<>();
-//        while (headerNames.hasMoreElements()) {
-//            String header = headerNames.nextElement();
-//            headers.put(header, request.getHeader(header));
-//        }
-//        String rangeStr = request.getHeader("Range");
-//        String[] range;
-//        if (StringUtil.isNullOrEmpty(rangeStr)) {
-//            rangeStr = "bytes=0-" + (totalFileSize-1);
-//        }
-//        range = rangeStr.split("bytes=|-");
-//        long begin = 0;
-//        if (range.length >= 2) {
-//            begin = Long.parseLong(range[1]);
-//        }
-//        long end = totalFileSize - 1;
-//        if (range.length >= 3) {
-//            end = Long.parseLong(range[2]);
-//        }
-//        long len = (end - begin) + 1;
-//        String contentRange = "bytes " + begin + "-" + end + "/" + totalFileSize;
-//        response.setHeader("Content-Range", contentRange);
-//        response.setHeader("Accept-Ranges", "bytes");
-//        response.setHeader("Content-Type", "video/mp4");
-//        response.setContentLength((int)len);
-//        response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-//        HttpUtil.get(url, headers, response);
-//    }
-//
+    public void viewVideoOnlineBySlices(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        String path) throws Exception{
+        FileInfo fileInfo = fastFileStorageClient.queryFileInfo(DEFAULT_GROUP, path);
+        long totalFileSize = fileInfo.getFileSize();
+        String url = httpFdfsStorageAddr + path;
+        Enumeration<String> headerNames = request.getHeaderNames();
+        Map<String, Object> headers = new HashMap<>();
+        while (headerNames.hasMoreElements()) {
+            String header = headerNames.nextElement();
+            headers.put(header, request.getHeader(header));
+        }
+        String rangeStr = request.getHeader("Range");
+        String[] range;
+        if (StringUtil.isNullOrEmpty(rangeStr)) {
+            rangeStr = "bytes=0-" + (totalFileSize-1);
+        }
+        range = rangeStr.split("bytes=|-");
+        long begin = 0;
+        if (range.length >= 2) {
+            begin = Long.parseLong(range[1]);
+        }
+        long end = totalFileSize - 1;
+        if (range.length >= 3) {
+            end = Long.parseLong(range[2]);
+        }
+        long len = (end - begin) + 1;
+        String contentRange = "bytes " + begin + "-" + end + "/" + totalFileSize;
+        response.setHeader("Content-Range", contentRange);
+        response.setHeader("Accept-Ranges", "bytes");
+        response.setHeader("Content-Type", "video/mp4");
+        response.setContentLength((int)len);
+        response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        HttpUtil.get(url, headers, response);
+    }
+
     // Download file
     public void downLoadFile(String url, String localPath) {
         fastFileStorageClient.downloadFile(DEFAULT_GROUP, url,

@@ -40,14 +40,20 @@ public class MD5Util {
 
     //获取文件md5加密后的字符串
     public static String getFileMD5(MultipartFile file) throws Exception {
+        //输入流生成
         InputStream fis = file.getInputStream();
+        //把输出流变成了一个个BYTE
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         int byteRead;
+
+        //只要FILE不为空，就把INPUT导入到OUTPUT
         while((byteRead = fis.read(buffer)) > 0){
             baos.write(buffer, 0, byteRead);
         }
         fis.close();
+
+        //将OUTPUT转化为2进制流，返回一个MD5加密的流
         return DigestUtils.md5Hex(baos.toByteArray());
     }
 }
