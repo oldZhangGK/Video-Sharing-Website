@@ -209,9 +209,9 @@ public class VideoService {
         if (amount > userCoinsAmount) {
             throw new ConditionException("Coin amount not enough！");
         }
-        //Check how many coins the user has deposited for current video, 用户一共打赏了多少次，做成累积以减少流量负担
+        //Check how many coins the user has deposited for current video
         VideoCoin dbVideoCoin = videoDao.getVideoCoinByVideoIdAndUserId(videoId, userId);
-        //Increase coin deposit,如果是NULL就是用户之前没透过钱
+        //Increase coin deposit
         if (dbVideoCoin == null) {
             videoCoin.setUserId(userId);
             videoCoin.setCreateTime(new Date());
@@ -225,7 +225,7 @@ public class VideoService {
             videoCoin.setUpdateTime(new Date());
             videoDao.updateVideoCoin(videoCoin);
         }
-        //Update user total coin amount，更新用户的余额
+        //Update user total coin amount
         userCoinService.updateUserCoinsAmount(userId, (userCoinsAmount-amount));
     }
 
@@ -262,18 +262,16 @@ public class VideoService {
         params.put("start", (no-1)*size);
         params.put("limit", size);
         params.put("videoId", videoId);
-        Integer total = videoDao.pageCountVideoComments(params); //总计多少条评论
+        Integer total = videoDao.pageCountVideoComments(params);
         List<VideoComment> list = new ArrayList<>();
         if (total > 0) {
             list = videoDao.pageListVideoComments(params);
             if (!list.isEmpty()) {
-                //Batch query for secondary comments， 每一次我们记录这条评论的时候我们去检查他是不是根评论，或者是二级评论（回复评论）
+                //Batch query for secondary comments
                 List<Long> parentIdList = list.stream().map(VideoComment::getId).collect(Collectors.toList());
                 //Batch query for user information
                 Set<Long> userIdList = list.stream().map(VideoComment::getUserId).collect(Collectors.toSet());
-                //通过Children去找的parent
                 List<VideoComment> childCommentList = videoDao.batchGetVideoCommentsByRootIds(parentIdList);
-                //用SET去重
                 Set<Long> replyUserIdList = childCommentList.stream()
                         .map(VideoComment::getUserId).collect(Collectors.toSet());
                 Set<Long> childUserIdList = childCommentList.stream()
@@ -286,7 +284,6 @@ public class VideoService {
                 list.forEach(comment -> {
                     Long id = comment.getId();
                     List<VideoComment> childList = new ArrayList<>();
-                    //找到所有的子评论
                     childCommentList.forEach(child -> {
                         if (id.equals(child.getRootId())) {
                             child.setUserInfo(userInfoMap.get(child.getUserId()));
