@@ -5,6 +5,7 @@ import com.example.bilibili.domain.UserFollowing;
 import com.example.bilibili.domain.UserMoment;
 import com.example.bilibili.domain.constant.UserMomentsConstant;
 import com.example.bilibili.service.UserFollowingService;
+import com.example.bilibili.service.websocket.WebSocketService;
 import io.netty.util.internal.StringUtil;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +60,7 @@ public class RocketMQConfig {
                 UserMoment userMoment = JSONObject.toJavaObject(JSONObject.parseObject(bodyStr), UserMoment.class);
                 //找到这个动态的userId,目的是为了查询关注这个动态USERID的所有订阅者
                 Long userId = userMoment.getUserId();
-                List<UserFollowing>fanList = userFollowingService.getUserFans(userId);
+                List<UserFollowing> fanList = userFollowingService.getUserFans(userId);
                 //对每一个用户和粉丝，用MQ发送动态消息告知
                 for (UserFollowing fan : fanList) {
                     String key = "subscribed-" + fan.getUserId();
@@ -78,6 +80,44 @@ public class RocketMQConfig {
                     //把新的订阅列表存入REDIS当中
                     redisTemplate.opsForValue().set(key, JSONObject.toJSONString(subscribedList));
                 }
+                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+            }
+        });
+        consumer.start();
+        return consumer;
+    }
+
+    @Bean("danmusProducer")
+    public DefaultMQProducer danmusProducer() throws Exception{
+        DefaultMQProducer producer = new DefaultMQProducer(UserMomentsConstant.GROUP_DANMUS);
+        producer.setNamesrvAddr(nameServerAddr);
+        producer.start();
+        return producer;
+    }
+
+    @Bean("danmusConsumer")
+    public DefaultMQPushConsumer danmusConsumer() throws Exception{
+        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(UserMomentsConstant.GROUP_DANMUS);
+        consumer.setNamesrvAddr(nameServerAddr);
+        consumer.subscribe(UserMomentsConstant.TOPIC_DANMUS, "*");
+        consumer.registerMessageListener(new MessageListenerConcurrently() {
+            @Override
+            public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
+                MessageExt msg = msgs.get(0);
+                byte[] msgByte = msg.getBody();
+                String bodyStr = new String(msgByte);
+                JSONObject jsonObject = JSONObject.parseObject(bodyStr);
+                String sessionId = jsonObject.getString("sessionId");
+                String message = jsonObject.getString("message");
+                WebSocketService webSocketService = WebSocketService.WEBSOCKET_MAP.get(sessionId);
+                if (webSocketService.getSession().isOpen()) {
+                    try {
+                        webSocketService.sendMessage(message);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // Mark current message is successfully consumed
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
         });
