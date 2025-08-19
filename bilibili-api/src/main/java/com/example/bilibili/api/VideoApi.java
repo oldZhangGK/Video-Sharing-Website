@@ -2,6 +2,7 @@ package com.example.bilibili.api;
 
 import com.example.bilibili.api.support.UserSupport;
 import com.example.bilibili.domain.*;
+import com.example.bilibili.service.ElasticSearchService;
 import com.example.bilibili.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,8 @@ public class VideoApi {
     @Autowired
     private UserSupport userSupport;
 
+    @Autowired
+    private ElasticSearchService elasticSearchService;
 
     /**
      * Video upload
@@ -33,6 +36,8 @@ public class VideoApi {
         Long userId = userSupport.getCurrentUserId();
         video.setUserId(userId);
         videoService.addVideos(video);
+        //Add a video record in elastic search
+        elasticSearchService.addVideo(video);
         return JsonResponse.success();
     }
 
@@ -185,6 +190,8 @@ public class VideoApi {
         Map<String, Object> result = videoService.getVideoDetails(videoId);
         return new JsonResponse<>(result);
     }
+
+
 
 
 }
