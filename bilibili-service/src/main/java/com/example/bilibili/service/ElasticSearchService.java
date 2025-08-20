@@ -35,7 +35,6 @@ public class ElasticSearchService {
     private ElasticsearchClient elasticsearchClient;
 
     public void addUserInfo(UserInfo userInfo) {
-        System.out.println("Saving UserInfo: " + userInfo);
         userInfoRepository.save(userInfo);
     }
 
@@ -44,6 +43,7 @@ public class ElasticSearchService {
     }
 
     public List<Map<String, Object>> getContents(String keyword, Integer pageNo, Integer pageSize) throws IOException {
+        // 搜索的数据种类，种类在dao.domain里定义
         String[] indices = {"videos", "user-infos"};
 
         // Build the search request
@@ -54,14 +54,14 @@ public class ElasticSearchService {
                 .query(q -> q
                         .multiMatch(m -> m
                                 .query(keyword)
-                                .fields("title", "nick", "description") // Fields to match on
+                                .fields("title", "nick", "description") // Fields to match on, title来自Video, nick, description来自UserInfo
                         )
                 )
                 .highlight(h -> h
                         .fields("title", f -> f) // Highlight these fields
                         .fields("nick", f -> f)
                         .fields("description", f -> f)
-                        .preTags("<span style=\"color:red\">") // Pre-highlight tag
+                        .preTags("<span style=\"color:red\">") // Pre-highlight tag 高亮显示
                         .postTags("</span>") // Post-highlight tag
                 )
                 .timeout("60s")  // Set timeout
@@ -72,6 +72,7 @@ public class ElasticSearchService {
 
         // Process the search hits and handle highlighting
         List<Map<String, Object>> results = new ArrayList<>();
+        //为什么response.hits().hits()有两个hits()? 在ES里，第一次hits()执行完后只能找到所有的hits(),再执行一次hits()才能找到每一个hit
         for (Hit<Map> hit : response.hits().hits()) {
             Map source = hit.source(); // Generic Map type
             if (source != null) {

@@ -7,6 +7,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 
 public interface UserInfoRepository extends ElasticsearchRepository<UserInfo, Long> {
 
+    //根据昵称检索
     long countByNick(String nickKeyword);
 
     Page<UserInfo> findByNickOrderByFanCountDesc(String nickKeyword, PageRequest pageRequest);
