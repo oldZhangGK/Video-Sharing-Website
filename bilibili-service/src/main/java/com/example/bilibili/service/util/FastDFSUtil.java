@@ -261,4 +261,20 @@ public class FastDFSUtil {
                     }
                 });
     }
+
+    public String uploadCommonFile(MultipartFile file) throws Exception {
+        Set<MetaData> metaDataSet = new HashSet<>();
+        String fileType = this.getFileType(file);
+        StorePath storePath = fastFileStorageClient.uploadFile(file.getInputStream(), file.getSize(), fileType, metaDataSet);
+        return storePath.getPath();
+    }
+
+    public String uploadCommonFile(File file, String fileType) throws Exception {
+        Set<MetaData> metaDataSet = new HashSet<>();
+        StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(file),
+                file.length(), fileType, metaDataSet);
+        return storePath.getPath();
+    }
+
+
 }

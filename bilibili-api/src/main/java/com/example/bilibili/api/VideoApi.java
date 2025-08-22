@@ -6,14 +6,14 @@ import com.example.bilibili.service.ElasticSearchService;
 import com.example.bilibili.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-//import com.alibaba.fastjson.JSONArray;
-//import com.alibaba.fastjson.JSONObject;
-//import com.example.bilibili.service.ElasticSearchService;
-//import org.apache.mahout.cf.taste.common.TasteException;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.example.bilibili.service.ElasticSearchService;
+import org.apache.mahout.cf.taste.common.TasteException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-//import java.util.HashMap;
-//import java.util.List;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -191,7 +191,107 @@ public class VideoApi {
         return new JsonResponse<>(result);
     }
 
+    /**
+     * Add video view record
+     */
+    @PostMapping("/video-views")
+    public JsonResponse<String> addVideoView(@RequestBody VideoView videoView,
+                                             HttpServletRequest request){
+        Long userId;
+        try{
+            userId = userSupport.getCurrentUserId();
+            videoView.setUserId(userId);
+            videoService.addVideoView(videoView, request);
+        }catch (Exception e){
+            videoService.addVideoView(videoView, request);
+        }
+        //Sync video view count to Elasticsearch
+        elasticSearchService.updateVideoViewCount(videoView.getVideoId());
+        return JsonResponse.success();
+    }
 
+    /**
+     * Get video view count
+     */
+    @GetMapping("/video-view-counts")
+    public JsonResponse<Integer> getVideoViewCounts(@RequestParam Long videoId){
+        Integer count = videoService.getVideoViewCounts(videoId); //一个视频的总观看量
+        return new JsonResponse<>(count);
+    }
+
+    /**
+     * Video recommendation
+     */
+    @GetMapping("/recommendations")
+    public JsonResponse<List<Video>> recommend() throws TasteException {
+        Long userId = userSupport.getCurrentUserId();
+        List<Video> list = videoService.recommend(userId);
+        return new JsonResponse<>(list);
+    }
+
+    /**
+     * Video Frame Capture and Black-and-White Silhouette Generation
+     */
+//    @GetMapping("/video-frames")
+//    public JsonResponse<List<VideoBinaryPicture>> captureVideoFrame(@RequestParam Long videoId,
+//                                                                    @RequestParam String fileMd5) throws Exception {
+//        List<VideoBinaryPicture> list = videoService.convertVideoToImage(videoId, fileMd5);
+//        return new JsonResponse<>(list);
+//    }
+//
+//    /**
+//     * 查询视频黑白剪影
+//     */
+//    @GetMapping("/video-binary-images")
+//    public JsonResponse<List<VideoBinaryPicture>> getVideoBinaryImages(@RequestParam Long videoId,
+//                                                                       Long videoTimestamp,
+//                                                                       String frameNo) {
+//        Map<String, Object> params = new HashMap<>();
+//        params.put("videoId", videoId);
+//        params.put("videoTimestamp", videoTimestamp);
+//        params.put("frameNo", frameNo);
+//        List<VideoBinaryPicture> list = videoService.getVideoBinaryImages(params);
+//        return new JsonResponse<>(list);
+//    }
+//
+//    /**
+//     * Search video tags
+//     */
+//    @GetMapping("/video-tags")
+//    public JsonResponse<List<VideoTag>> getVideoTagsByVideoId(@RequestParam Long videoId) {
+//        List<VideoTag> list = videoService.getVideoTagsByVideoId(videoId);
+//        return new JsonResponse<>(list);
+//    }
+//
+//    /**
+//     * Delete video tags
+//     */
+//    @DeleteMapping("/video-tags")
+//    public JsonResponse<String> deleteVideoTags(@RequestBody JSONObject params) {
+//        String tagIdList = params.getString("tagIdList");
+//        Long videoId = params.getLong("videoId");
+//        videoService.deleteVideoTags(JSONArray.parseArray(tagIdList).toJavaList(Long.class), videoId);
+//        return JsonResponse.success();
+//    }
+
+    /**
+     * Video recommendation (visitor)
+     */
+    @GetMapping("/visitor-video-recommendations")
+    public JsonResponse<List<Video>> getVisitorVideoRecommendations() {
+        List<Video> list = videoService.getVisitorVideoRecommendations();
+        return new JsonResponse<>(list);
+    }
+
+    /**
+     * Video recommendation (combined)
+     */
+    @GetMapping("/video-recommendations")
+    public JsonResponse<List<Video>> getVideoRecommendations(@RequestParam String recommendType) {
+        Long userId = userSupport.getCurrentUserId();
+        List<Video> list = videoService.getVideoRecommendations(recommendType, userId);
+        return new JsonResponse<>(list);
+    }
 
 
 }
